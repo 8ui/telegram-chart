@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "no-console": 1,
+    "semi": 0,
+    "no-multiple-empty-lines": 0,
+    "space-in-parens": ["error", "never"],
+    "quotes": 0,
+    "comma-dangle": 0,
+    "no-unused-vars": 1,
+    "no-undef": 1,
+  }
+}

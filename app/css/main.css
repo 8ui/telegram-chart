@@ -1,0 +1,268 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  user-select: none;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+  transition: color 0.3s, background-color 0.3s;
+  min-height: 101vh;
+}
+
+body.theme_day,
+.theme_day body {
+  background-color: #fff;
+}
+
+body.theme_night,
+.theme_night body {
+  background-color: #242f3e;
+}
+
+body.theme_day,
+.theme_day body {
+  color: #000;
+}
+
+body.theme_night,
+.theme_night body {
+  color: #fff;
+}
+
+body *, body :after, body :before {
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+}
+
+body h2 {
+  font-size: 23px;
+  font-weight: 600;
+  padding: 16px 22px 15px;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+#charts .chart-view {
+  padding: 28px 0;
+  user-select: none;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+#charts .chart-view .chart {
+  position: relative;
+}
+
+#charts .chart-view .chart .chart-wrapper {
+  height: 474px;
+  position: relative;
+  margin-bottom: 54px;
+}
+#charts canvas {
+  width: 100%;
+}
+#charts .chart-view canvas.axis {
+  position: absolute;
+}
+
+#charts .chart-view .canvas,
+#charts .chart-view .canvas-preview,
+#charts .chart-view .canvas-overlay {
+  position: absolute;
+  bottom: 0;
+}
+#charts .chart-view .canvas,
+#charts .chart-view .canvas-preview {
+  transform: scaleY(-1);
+}
+#charts .chart-view .canvas-overlay {
+  z-index: 1;
+}
+
+#charts .switch-theme {
+  padding: 150px 0 40px;
+  font-size: 26px;
+  color: #48aaf0;
+  text-align: center;
+}
+
+#charts .switch-theme a {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+
+.preview {
+  border-radius: 15px;
+  height: 60px;
+  margin: 0 24px 10px;
+  position: relative;
+  user-select: none;
+}
+
+.preview .canvas-preview {
+  border-radius: 9px;
+}
+
+.preview .control {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.preview .control .overlay {
+  transition: background-color 0.3s;
+}
+
+.preview .control .overlay.theme_day,
+.theme_day .preview .control .overlay {
+  background-color: rgba(226, 238, 249, 0.6);
+}
+
+.preview .control .overlay.theme_night,
+.theme_night .preview .control .overlay {
+  background-color: rgba(48, 66, 89, 0.6);
+}
+
+.preview .control .overlay:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.preview .control .overlay:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.preview .control .visible {
+  position: relative;
+  flex: 1;
+  cursor: move;
+  border-style: solid;
+  border-color: #fff;
+  transition: border-color 0.3s;
+  border-width: 2px 0;
+  margin: -2px 0;
+}
+
+.preview .control .visible.theme_day,
+.theme_day .preview .control .visible {
+  border-color: #C0D1E1;
+}
+
+.preview .control .visible.theme_night,
+.theme_night .preview .control .visible {
+  border-color: #56626D;
+}
+
+.preview .control .visible .left, .preview .control .visible .right {
+  background-color: #fff;
+  transition: background-color 0.3s;
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  cursor: ew-resize;
+  width: 15px;
+}
+
+.preview .control .visible .left.theme_day,
+.theme_day .preview .control .visible .left, .preview .control .visible .right.theme_day,
+.theme_day .preview .control .visible .right {
+  background-color: #C0D1E1;
+}
+
+.preview .control .visible .left.theme_night,
+.theme_night .preview .control .visible .left, .preview .control .visible .right.theme_night,
+.theme_night .preview .control .visible .right {
+  background-color: #56626D;
+}
+
+.preview .control .visible .left:after, .preview .control .visible .right:after {
+  content: '';
+  width: 3px;
+  height: 15px;
+  background-color: white;
+  border-radius: 3px;
+  position: absolute;
+  top: 50%;
+  margin-top: -7.5px;
+}
+
+.preview .control .visible .left.left, .preview .control .visible .right.left {
+  left: -15px;
+  border-radius: 10px 0 0 10px;
+}
+
+.preview .control .visible .left.left:after, .preview .control .visible .right.left:after {
+  left: 5px;
+}
+
+.preview .control .visible .left.right, .preview .control .visible .right.right {
+  right: -15px;
+  border-radius: 0 10px 10px 0;
+}
+
+.preview .control .visible .left.right:after, .preview .control .visible .right.right:after {
+  right: 5px;
+}
+
+.legend {
+  padding: 6px 24px 0;
+  color: #43484b;
+}
+
+.legend .checkbox {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  position: relative;
+  cursor: pointer;
+  font-size: 21px;
+  margin: 10px 9px 2px 0;
+  border: 2px solid currentColor;
+  border-radius: 50px;
+  height: 54px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.legend .checkbox span {
+  font-weight: 500;
+  transform: translateX(-11px);
+  transition: transform 0.3s, color 0.3s;
+}
+
+.legend .checkbox i {
+  color: rgba(176, 193, 204, 0.3);
+  width: 25px;
+  height: 17px;
+  border-radius: 30px;
+  transition: transform 0.3s, opacity 0.3s;
+  padding-right: 8px;
+  background-image: url("./check.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-25px) scale(0.3);
+}
+
+.legend .checkbox.checked {
+  background-color: currentColor;
+}
+
+.legend .checkbox.checked span {
+  color: white !important;
+  transform: translateX(0);
+}
+
+.legend .checkbox.checked i {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
