@@ -1,4 +1,5 @@
 function Chart(el, data, species) {
+	var PXR = window.devicePixelRatio
 	var PADDING = 24
 	var DURATION = 400
 	var PREVIEW_MIN = 64
@@ -95,14 +96,16 @@ function Chart(el, data, species) {
 	}
 
 	function resize() {
-		W = ChartWr.offsetWidth
-		PW = PreviewWr.offsetWidth
-		MainCanvas.setAttribute('width', W)
-		OverCanvas.setAttribute('width', W)
-		AxisCanvas.setAttribute('width', W)
-		PreviewCanvas.setAttribute('width', PW)
-		update()
-		drawMain = drawPreview = drawOverlay = drawHeader = true;
+		if (W !== ChartWr.offsetWidth) {
+			W = ChartWr.offsetWidth
+			PW = PreviewWr.offsetWidth
+			MainCTX.resize(W)
+			OverlayCTX.resize(W)
+			AxisCTX.resize(W)
+			PreviewCTX.resize(PW)
+			update()
+			drawMain = drawPreview = drawOverlay = drawHeader = true;
+		}
 	}
 
 	this.init = function() {
@@ -111,29 +114,19 @@ function Chart(el, data, species) {
 
 		W = ChartWr.offsetWidth, H = ChartWr.offsetHeight - headerH
 
-		MainCanvas = dom('canvas', ChartWr, {
-			className: 'canvas',
-		})
+		MainCanvas = dom('canvas', ChartWr, 'canvas')
 		MainCTX = new Canvas(MainCanvas, W, H, font)
 
-		OverCanvas = dom('canvas', ChartWr, {
-			className: 'canvas-overlay',
-		})
+		OverCanvas = dom('canvas', ChartWr, 'canvas-overlay')
 		OverlayCTX = new Canvas(OverCanvas, W, H, font)
 
-		AxisCanvas = dom('canvas', ChartWr, {
-			className: 'axis',
-		})
+		AxisCanvas = dom('canvas', ChartWr, 'axis')
 		AxisCTX = new Canvas(AxisCanvas, W, xAxisH + H + headerH, font)
 
 		// PREVIEW
 		PreviewWr = dom('div', el, 'preview')
 		PW = PreviewWr.offsetWidth, PH = PreviewWr.offsetHeight
-		PreviewCanvas = dom('canvas', PreviewWr, {
-			className: 'canvas-preview',
-			width: PW,
-			height: PH
-		})
+		PreviewCanvas = dom('canvas', PreviewWr, 'canvas-preview')
 		PreviewCTX = new Canvas(PreviewCanvas, PW, PH, font)
 
 		move(OverCanvas, el, selectBar);
@@ -210,24 +203,24 @@ function Chart(el, data, species) {
 
 	function textChangeAnim(ctx, nextText, prevText, x, y, style, anim) {
 		var scale = 1 * anim, sc = 0.5
-		ctx.textAlign = style.textAlign
-		ctx.fillStyle = style.fillStyle
+		ctx.d.textAlign = style.textAlign
+		ctx.d.fillStyle = style.fillStyle
 		ctx.font(style.font[0], style.font[1])
 
 		if (prevText !== nextText && prevText !== false) {
 			scale = 1 - sc * anim
-			ctx.globalAlpha = 1 - anim
-			ctx.scale(scale, scale)
+			ctx.d.globalAlpha = 1 - anim
+			ctx.d.scale(scale, scale)
 			ctx.translate(0, 1 / scale * -15 * anim);
 			ctx.fillText(prevText, 1 / scale * x, 1 / scale * y);
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.d.setTransform(1, 0, 0, 1, 0, 0);
 
 			scale = sc + (1 - sc) * anim
-			ctx.globalAlpha = anim
-			ctx.scale(scale, scale)
-			ctx.translate(0, 1 / scale * 15 * (1 - anim));
+			ctx.d.globalAlpha = anim
+			ctx.d.scale(scale, scale)
+			ctx.d.translate(0, 1 / scale * 15 * (1 - anim));
 			ctx.fillText(nextText, 1 / scale * x, 1 / scale * y);
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.d.setTransform(1, 0, 0, 1, 0, 0);
 		} else {
 			ctx.fillText(nextText, x, y);
 		}
@@ -244,10 +237,10 @@ function Chart(el, data, species) {
 
 		if (type == 'bar') X += step / 2
 
-		ctx.globalAlpha = op
-		ctx.shadowColor = color.tooltipBoxShadow;
+		ctx.d.globalAlpha = op
+		ctx.d.shadowColor = color.tooltipBoxShadow;
 		ctx.shadowBlur(5);
-		ctx.fillStyle = color.tooltipBG;
+		ctx.d.fillStyle = color.tooltipBG;
 
 		X = X - (w * side) + (15 - 30 * side)
 		Y = 30
@@ -289,13 +282,13 @@ function Chart(el, data, species) {
 		roundRect(ctx, X, Y, w, h, 18, true);
 		tooltipPos = {x: X, y: Y, w: w, h: h}
 
-		ctx.globalAlpha = op
+		ctx.d.globalAlpha = op
 		textChangeAnim(ctx, formatDate(xs[gi], 'dname, dnum'), formatDate(xs[old], 'dname, dnum'), X + padX, Y + padY + 18, {
 			fillStyle: color.color,
 			font: [18, 600],
 			textAlign: 'left'
 		}, anim)
-		ctx.globalAlpha = op
+		ctx.d.globalAlpha = op
 		textChangeAnim(ctx, formatDate(xs[gi], 'mnt year'), formatDate(xs[old], 'mnt year'), X + padX + 70, Y + padY + 18, {
 			fillStyle: color.color,
 			font: [18, 600],
@@ -305,17 +298,17 @@ function Chart(el, data, species) {
 		for (i = 0; i < items[0].length; i++) {
 			var top = Y + padY + 18 + titleH + itemH * i;
 
-			ctx.globalAlpha = op
-			ctx.fillStyle = color.color;
+			ctx.d.globalAlpha = op
+			ctx.d.fillStyle = color.color;
 			if (isArea) {
 				textChangeAnim(ctx, items[0][i][3], items[1][i][3], X + padX + 36, top, {
 					font: [18, 600],
 					textAlign: 'right'
 				}, anim)
-				ctx.globalAlpha = op
+				ctx.d.globalAlpha = op
 			}
 
-			ctx.textAlign = 'left'
+			ctx.d.textAlign = 'left'
 			ctx.font(18)
 			ctx.fillText(items[0][i][1], X + padX + (isArea ? 44 : 0), top);
 
@@ -328,7 +321,7 @@ function Chart(el, data, species) {
 	}
 
 	function roundRect(ctx, x, y, width, height, radius) {
-		ctx.beginPath();
+		ctx.d.beginPath();
 		ctx.moveTo(x + radius, y);
 		ctx.lineTo(x + width - radius, y);
 		ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
@@ -338,8 +331,8 @@ function Chart(el, data, species) {
 		ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
 		ctx.lineTo(x, y + radius);
 		ctx.quadraticCurveTo(x, y, x + radius, y);
-		ctx.closePath();
-		ctx.fill();
+		ctx.d.closePath();
+		ctx.d.fill();
 		ctx.shadowBlur(0);
 	}
 
@@ -351,18 +344,18 @@ function Chart(el, data, species) {
 		var ctx = OverlayCTX
 		ctx.clearRect(0, 0, W, H)
 		if (activeBarIndex == -1) return;
-		ctx.globalAlpha = (+(type === 'line') || 0.5) * op
+		ctx.d.globalAlpha = (+(type === 'line') || 0.5) * op
 		ctx.shadowBlur(0);
 		switch (type) {
 			case 'line':
 			case 'area': {
-				ctx.strokeStyle = color.tooltipArrow
+				ctx.d.strokeStyle = color.tooltipArrow
       	ctx.lineWidth(1);
-		    ctx.beginPath();
+		    ctx.d.beginPath();
 				ctx.moveTo(pos, 0 + (type === 'area' ? areaTopOffset : 0));
 				ctx.lineTo(pos, H)
-				ctx.stroke()
-				ctx.closePath();
+				ctx.d.stroke()
+				ctx.d.closePath();
 				if (type == 'line') {
 					for (var s = 0; s < series.length; s++) {
 						var se = yscaled ? s : 0
@@ -372,29 +365,29 @@ function Chart(el, data, species) {
 							var offset = (oldY - y) * (1 - arc)
 							y += offset;
 						}
-						ctx.beginPath();
+						ctx.d.beginPath();
 						ctx.lineWidth(lineW * 2)
-						ctx.strokeStyle = series[s].color
-						ctx.fillStyle = color.bg
+						ctx.d.strokeStyle = series[s].color
+						ctx.d.fillStyle = color.bg
 						ctx.arc(pos, y, 4, 0, 2 * Math.PI)
-						ctx.stroke();
-						ctx.fill();
+						ctx.d.stroke();
+						ctx.d.fill();
 					}
 				}
 				break
 			}
 			case 'bar': {
 				w = pos
-				ctx.fillStyle = color.bg
+				ctx.d.fillStyle = color.bg
 				ctx.rect(0, 0, w, H)
-				ctx.fill()
+				ctx.d.fill()
 
-				ctx.beginPath()
+				ctx.d.beginPath()
 				w = W - pos - nCoords.rw[i]
-				ctx.fillStyle = color.bg
+				ctx.d.fillStyle = color.bg
 				ctx.rect(pos + nCoords.rw[i], 0, w, H)
-				ctx.closePath();
-				ctx.fill()
+				ctx.d.closePath();
+				ctx.d.fill()
 				break
 			}
 			default:
@@ -423,12 +416,12 @@ function Chart(el, data, species) {
 			textAlign: 'right'
 		}, anim)
 
-		ctx.globalAlpha = 1
+		ctx.d.globalAlpha = 1
 	}
 
 	function updateMain() {
 		var ctx = MainCTX
-		ctx.globalAlpha = 1
+		ctx.d.globalAlpha = 1
 		ctx.clearRect(0, 0, W, H)
 
 		AxisCTX.clearRect(0, headerH, W, H)
@@ -509,12 +502,12 @@ function Chart(el, data, species) {
 				gBarH = sum / animGMaxY[0].value * gH * scaleY[0].value
 
 				for (j = 0; j < series.length; j++) {
-					ctx.beginPath()
+					ctx.d.beginPath()
 					barH = ((series[j].pts[i] / sum) * gBarH * series[j].anim.value)
-					ctx.fillStyle = series[j].color
+					ctx.d.fillStyle = series[j].color
 					ctx.rect(x[1], y, w[1], barH)
 					y += barH
-					ctx.fill()
+					ctx.d.fill()
 				}
 	    }
 		}
@@ -528,7 +521,7 @@ function Chart(el, data, species) {
 		for (gi = 0; gi < series.length; gi++) {
 			if(series[gi].anim.value) {
 				sum = 0, gsum = 0
-				ctx.beginPath()
+				ctx.d.beginPath()
 				if (g === 0) {
 					if (TYPE === 'preview') {
 						ctx.rect(0, 0, gW, gH)
@@ -563,8 +556,8 @@ function Chart(el, data, species) {
 					ctx.lineTo(c.x[l], gH)
 					ctx.lineTo(c.x[f], gH)
 				}
-				ctx.fillStyle = series[gi].color
-				ctx.fill()
+				ctx.d.fillStyle = series[gi].color
+				ctx.d.fill()
 
 				g++;
 			}
@@ -576,11 +569,11 @@ function Chart(el, data, species) {
 		if (TYPE === 'preview') gH = PH, gW = PW
 		for (i = 0; i < series.length; i++) {
 			anI = yscaled ? i : 0;
-			ctx.globalAlpha = series[i].anim.value;
-			ctx.strokeStyle = series[i].color
-	    ctx.beginPath();
-			ctx.lineJoin = 'bevel';
-			ctx.lineCap = 'butt';
+			ctx.d.globalAlpha = series[i].anim.value;
+			ctx.d.strokeStyle = series[i].color
+	    ctx.d.beginPath();
+			ctx.d.lineJoin = 'bevel';
+			ctx.d.lineCap = 'butt';
 			for (j = 0; j < xs.length; j++) {
 				if (c.x[j] + c.w >= -20 && c.x[j] - 20 <= gW) {
 					y = TYPE == 'preview'
@@ -591,7 +584,7 @@ function Chart(el, data, species) {
 					ctx.lineTo(c.x[j], y)
 				}
 	    }
-			ctx.stroke()
+			ctx.d.stroke()
 		}
 	}
 
@@ -603,30 +596,30 @@ function Chart(el, data, species) {
 		if (type === 'area') {
 			var ctx = MainCTX
 			ctx.font(16);
-			ctx.strokeStyle = color.grid;
+			ctx.d.strokeStyle = color.grid;
 			ctx.lineWidth(1);
 			for (var i = 0; i < 5; i++) {
 				var n = i * (1 / 4)
 				var y = (H - 25) - n * (H - 25) + 25
-				ctx.beginPath();
+				ctx.d.beginPath();
 				ctx.moveTo(PADDING, y)
 				ctx.lineTo(W - PADDING, y)
-				ctx.fillStyle = color.axisText;
+				ctx.d.fillStyle = color.axisText;
 				ctx.fillText(n * 100 + '%', PADDING, y - 6);
-				ctx.stroke()
+				ctx.d.stroke()
 			}
 		} else {
 			if (textY.anim.value > 0) {
-				ctx.globalAlpha = textY.anim.value;
+				ctx.d.globalAlpha = textY.anim.value;
 
 				for (var i = 0; i < countAxisY; i++) {
 					var value = textY.delta * i
 					var y = H - value / animRangeY.value * H + headerH - 6
-					ctx.fillStyle = color.axisText
+					ctx.d.fillStyle = color.axisText
 					if (y > headerH + 16) {
 						if (!yscaled || yscaled && series[0].active) {
-							ctx.textAlign = 'left';
-							if (yscaled) ctx.fillStyle = series[0].color
+							ctx.d.textAlign = 'left';
+							if (yscaled) ctx.d.fillStyle = series[0].color
 							ctx.fillText(shortNum(value + minY[0]), PADDING, y);
 						}
 
@@ -634,8 +627,8 @@ function Chart(el, data, species) {
 							var text = series[0].active
 								? (value / (maxY[0] - minY[0])) * (maxY[1] - minY[1])
 								: textY.delta * i
-							ctx.textAlign = 'right';
-							ctx.fillStyle = series[1].color
+							ctx.d.textAlign = 'right';
+							ctx.d.fillStyle = series[1].color
 							ctx.fillText(shortNum(text + minY[1]), W - PADDING, y);
 						}
 					}
@@ -647,18 +640,18 @@ function Chart(el, data, species) {
 	function drawAxisLines(textY) {
 		var ctx = MainCTX
 		if (textY.anim.value > 0) {
-			ctx.globalAlpha = textY.anim.value;
-			ctx.strokeStyle = color.grid;
+			ctx.d.globalAlpha = textY.anim.value;
+			ctx.d.strokeStyle = color.grid;
 			ctx.lineWidth(1);
 
 			for (var i = 0; i < countAxisY; i++) {
 				var value = textY.delta * i;
 				var y = H - value / animRangeY.value * H
 				if (y > headerH) {
-					ctx.beginPath();
+					ctx.d.beginPath();
 					ctx.moveTo(PADDING, y);
 					ctx.lineTo(W - PADDING, y);
-					ctx.stroke();
+					ctx.d.stroke();
 				}
 			}
 		}
@@ -669,9 +662,9 @@ function Chart(el, data, species) {
 		var i, x
 
     if (textX.anim.value > 0) {
-      ctx.globalAlpha = textX.anim.value;
-			ctx.fillStyle = color.axisTextX || color.axisText
-			ctx.textAlign = 'left'
+      ctx.d.globalAlpha = textX.anim.value;
+			ctx.d.fillStyle = color.axisTextX || color.axisText
+			ctx.d.textAlign = 'left'
 
       var delta = textX.delta;
       if (skip) delta *= 2;

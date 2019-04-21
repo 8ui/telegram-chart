@@ -1,5 +1,5 @@
 var pxration = dom('div', document.body)
-pxration.innerText = window.devicePixelRatio
+pxration.innerText = 'devicePixelRatio: ' + window.devicePixelRatio
 pxration.style.textAlign = 'center'
 pxration.style.padding = '10px 0'
 

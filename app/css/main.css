@@ -10,6 +10,7 @@ body {
   text-rendering: optimizeLegibility;
   transition: color 0.3s, background-color 0.3s;
   min-height: 101vh;
+  min-width: 500px;
 }
 
 body.theme_day,
