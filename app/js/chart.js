@@ -358,6 +358,7 @@ function Chart(el, data, species) {
 				ctx.d.closePath();
 				if (type == 'line') {
 					for (var s = 0; s < series.length; s++) {
+						if (series[s].anim.value !== 1) continue
 						var se = yscaled ? s : 0
 						var y = H - (series[s].pts[i] - minY[se]) / (gmaxY[se] - gminY[se]) * H * scaleY[se]
 						if (arc !== 1) {
@@ -365,6 +366,7 @@ function Chart(el, data, species) {
 							var offset = (oldY - y) * (1 - arc)
 							y += offset;
 						}
+						ctx.globalAlpha = 1 - series[s].anim.value
 						ctx.d.beginPath();
 						ctx.lineWidth(lineW * 2)
 						ctx.d.strokeStyle = series[s].color
@@ -594,13 +596,11 @@ function Chart(el, data, species) {
 		ctx.font(16);
 		ctx.textAlign = 'left';
 		if (type === 'area') {
-			var ctx = MainCTX
-			ctx.font(16);
 			ctx.d.strokeStyle = color.grid;
 			ctx.lineWidth(1);
 			for (var i = 0; i < 5; i++) {
 				var n = i * (1 / 4)
-				var y = (H - 25) - n * (H - 25) + 25
+				var y = (H - 25) - n * (H - 25) + headerH + 25
 				ctx.d.beginPath();
 				ctx.moveTo(PADDING, y)
 				ctx.lineTo(W - PADDING, y)
@@ -618,12 +618,18 @@ function Chart(el, data, species) {
 					ctx.d.fillStyle = color.axisText
 					if (y > headerH + 16) {
 						if (!yscaled || yscaled && series[0].active) {
+							// if (ctx.d.globalAlpha === 1) {
+							// 	ctx.d.globalAlpha = yscaled ? series[0].anim.value : 1;
+							// }
 							ctx.d.textAlign = 'left';
 							if (yscaled) ctx.d.fillStyle = series[0].color
 							ctx.fillText(shortNum(value + minY[0]), PADDING, y);
 						}
 
 						if (yscaled && series[1].active) {
+							// if (ctx.d.globalAlpha === 1) {
+							// 	ctx.d.globalAlpha = series[1].anim.value;
+							// }
 							var text = series[0].active
 								? (value / (maxY[0] - minY[0])) * (maxY[1] - minY[1])
 								: textY.delta * i
@@ -638,15 +644,16 @@ function Chart(el, data, species) {
 	}
 
 	function drawAxisLines(textY) {
-		var ctx = MainCTX
+		var ctx = AxisCTX
 		if (textY.anim.value > 0) {
 			ctx.d.globalAlpha = textY.anim.value;
 			ctx.d.strokeStyle = color.grid;
 			ctx.lineWidth(1);
 
 			for (var i = 0; i < countAxisY; i++) {
-				var value = textY.delta * i;
-				var y = H - value / animRangeY.value * H
+				var value = textY.delta * (i + 1);
+				var y = H - value / animRangeY.value * H + headerH;
+				// i === -1 && console.log(value / animRangeY.value * H);
 				if (y > headerH) {
 					ctx.d.beginPath();
 					ctx.moveTo(PADDING, y);
@@ -741,6 +748,7 @@ function Chart(el, data, species) {
 
 	function update() {
 		for (var a = 0; a < YdiffAxis.length; a++) {
+			if (yscaled && !series[a].active) continue
 			var WIDTH = W - PADDING * 2;
 			var sum = []
 
@@ -767,10 +775,10 @@ function Chart(el, data, species) {
 				for (var j = 0; j < xs.length; j++) {
 					if (minX <= xs[j] && xs[j] <= maxX) {
 						maxY[a] = Math.max(maxY[a], sum[j]);
-						minY[a] = Math.min(minY[a], sum[j]);
+						minY[a] = type === 'bar' ? 0 : Math.min(minY[a], sum[j]);
 					}
 					gmaxY[a] = Math.max(gmaxY[a], sum[j]);
-					gminY[a] = Math.min(gminY[a], sum[j]);
+					gminY[a] = type === 'bar' ? 0 : Math.min(gminY[a], sum[j]);
 				}
 			}
 
