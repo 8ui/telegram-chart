@@ -82,8 +82,8 @@ function Chart(el, data, species) {
 			CheckBoxes
 
 	this.species = species.toLowerCase()
-	this.setTheme = function(с) {
-		color = с
+	this.setTheme = function(c) {
+		color = c
 		CheckBoxes && CheckBoxes()
 		drawMain = drawHeader = true;
 	}
@@ -579,7 +579,7 @@ function Chart(el, data, species) {
 			for (j = 0; j < xs.length; j++) {
 				if (c.x[j] + c.w >= -20 && c.x[j] - 20 <= gW) {
 					y = TYPE == 'preview'
-						? series[i].pts[j] / animGMaxY[anI].value * gH
+						? (series[i].pts[j] - gminY[anI]) / (animGMaxY[anI].value - gminY[anI]) * gH
 						: (series[i].pts[j] - animMinY[anI].value)
 							/ (animGMaxY[anI].value - animGMinY[anI].value)
 							* gH * scaleY[anI].value
@@ -594,7 +594,7 @@ function Chart(el, data, species) {
 		var ctx = AxisCTX
 
 		ctx.font(16);
-		ctx.textAlign = 'left';
+		ctx.d.textAlign = 'left';
 		if (type === 'area') {
 			ctx.d.strokeStyle = color.grid;
 			ctx.lineWidth(1);
@@ -605,7 +605,7 @@ function Chart(el, data, species) {
 				ctx.moveTo(PADDING, y)
 				ctx.lineTo(W - PADDING, y)
 				ctx.d.fillStyle = color.axisText;
-				ctx.fillText(n * 100 + '%', PADDING, y - 6);
+				ctx.fillText(n * 100, PADDING, y - 6);
 				ctx.d.stroke()
 			}
 		} else {
@@ -614,6 +614,7 @@ function Chart(el, data, species) {
 
 				for (var i = 0; i < countAxisY; i++) {
 					var value = textY.delta * i
+					// i === 0 && console.log(value, animRangeY.value);
 					var y = H - value / animRangeY.value * H + headerH - 6
 					ctx.d.fillStyle = color.axisText
 					if (y > headerH + 16) {
@@ -652,8 +653,7 @@ function Chart(el, data, species) {
 
 			for (var i = 0; i < countAxisY; i++) {
 				var value = textY.delta * (i + 1);
-				var y = H - value / animRangeY.value * H + headerH;
-				// i === -1 && console.log(value / animRangeY.value * H);
+				var y = i === countAxisY - 1 ? H + headerH : H - value / animRangeY.value * H + headerH;
 				if (y > headerH) {
 					ctx.d.beginPath();
 					ctx.moveTo(PADDING, y);

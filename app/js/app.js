@@ -7,7 +7,7 @@ var TITLES = [
   'Followers', 'Interactions', 'Messages', 'Growth', 'Apps'
 ]
 
-var THEME = 'theme_night'
+var THEME = 'theme_day'
 var charts = []
 var SwitchLink;
 
@@ -111,7 +111,7 @@ function init(data) {
     var type = TITLES[i];
     var wrapper = dom('div', el, 'chart-view chart-' + type.toLowerCase());
     var chart = new Chart(wrapper, data[i], type);
-    chart.setTheme(Object.assign({}, THEMES.theme_night, THEMES.theme_night[type.toLowerCase()]));
+    chart.setTheme(Object.assign({}, THEMES.theme_day, THEMES.theme_day[type.toLowerCase()]));
     chart.init();
     charts.push(chart);
   }
